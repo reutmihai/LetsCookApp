@@ -1,0 +1,6 @@
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Poți ajusta în funcție de nevoile tale */
+}
