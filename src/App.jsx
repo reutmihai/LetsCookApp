@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { Component } from "react";
+import { searchRecipes } from "../src/services/newRecipe";
+import Searchbar from "./components/Searchbar/Searchbar";
+import styles from "./App.module.css";
+import { RecipeList } from "./components/RecipeList/RecipeList";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default class App extends Component {
+  state = {
+    searchQuery: "",
+    recipes: [],
+    page: 1,
+    error: "",
+  };
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  handleSearchSubmit = async (searchQuery) => {
+    try {
+      this.setState({ searchQuery, page: 1, error: "" });
+      const recipes = await searchRecipes(searchQuery); 
+      console.log(recipes);
+      if (recipes.length === 0) {
+        this.setState({ recipes: [], error: "N-a fost gasita nicio reteta." });
+      } else {
+        this.setState({ recipes });
+      }
+    } catch (error) {
+      this.setState({ recipes: [], error: "A aparut o eroare la cautare." });
+    }
+  };
+
+  render() {
+    const { recipes, error } = this.state; 
+
+    return (
+      <div className={styles.App}>
+        <Searchbar onFormSubmit={this.handleSearchSubmit} />
+        {error && <p className={styles.Error}>{error}</p>}{" "}
+        <RecipeList recipes={recipes} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
+  }
 }
-
-export default App
